@@ -37,6 +37,30 @@ app.listen(port, ()=>{
 })
 })
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // sequelize.sync({ alter: true }).then(() => {
 //     // Find the Streams model and drop the table
 //     DepartmentHead.sync({ force: true }).then(() => {

@@ -11,7 +11,7 @@ router.post("/create-department", createDepartment);
 router.post("/create-stream", addStream);
 
 //get routes
-router.get("/get-",getAllStaff)
+router.get("/get-staffs",getAllStaff)
 router.get("/get-classes",getClasses)
 router.get("/get-department",getDepartment)
 module.exports = router; 

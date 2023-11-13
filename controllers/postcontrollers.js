@@ -18,7 +18,7 @@ const addStaff = async (req, res) => {
     res.send(Staff);
   } catch (err) {
     console.log(err);
-    res.status(500).send("Someting has gone wrong");
+    res.status(500).send("Something has gone wrong trying to create staff: " + err.message);
   }
 };
 

@@ -22,8 +22,20 @@ const Staffs = sequelize.define('Staffs', {
             allowNull: false,
             unique: true,
             validate: {
-                notEmpty: true,
-            }
+                notEmpty: {
+                    msg: 'Phone number is required',
+                },
+                async uniquePhoneNumber(value){
+                    const existingPhoneNumber= await Staffs.findOne({
+                        where:{
+                            number: value
+                        }
+                    })
+                    if (existingPhoneNumber) {
+                        throw new Error('Phone number already exists')
+                    }
+                }
+            },
         },
         teachingType: {
             type: Sequelize.ENUM('TEACHING', 'NON-TEACHING'),
@@ -41,13 +53,39 @@ const Class=sequelize.define('Class',{
         validate:{
             notEmpty: {
                 msg: 'Class is required'
+            },
+            async uniqueClassName(){
+                const existingClass= await Class.findOne({
+                    where:{
+                        name: this.name
+                    }
+                })
+                if (existingClass) {
+                    throw new Error('Class with the same name already exists')
+                }
             }
         }
     },
     abbreviation:{
         type: Sequelize.STRING,
         allowNull:false,
+        validate:{
+            notEmpty: {
+                msg: 'Abbreviation is required'
+            },
+            async uniqueClassName(){
+                const existingClass= await Class.findOne({
+                    where:{
+                        abbreviation: this.abbreviation
+                    }
+                })
+                if (existingClass) {
+                    throw new Error('Class with the same abbreviation already exists')
+                }
+            }
     },
+    },
+    
     headID:{
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -60,6 +98,14 @@ const Class=sequelize.define('Class',{
                 const Staff = await Staffs.findByPk(value)
                 if (Staff.teachingType !== "TEACHING") {
                     throw new Error('Staffs is not a teaching Staffs')
+                }
+                const existingClassHead= await Class.findOne({
+                    where:{
+                        headID: value,
+                    }
+                })
+                if (existingClassHead) {
+                    throw new Error('This staff is already the head of another class')
                 }
             }
         }
@@ -74,16 +120,41 @@ const Streams = sequelize.define('Streams', {
         allowNull: false,
         validate: {
             notEmpty: {
-                msg: 'Stream name is required'
-            }
-        }
+                msg: 'Stream name is required',
+            },
+            async uniqueStreamNameInClass() {
+                const existingStream = await Streams.findOne({
+                    where: {
+                        name: this.name,
+                        classID: this.classID,
+                    },
+                });
+
+                if (existingStream) {
+                    throw new Error('Stream with the same name already exists in this class');
+                }
+            },
+        },
     },
+    
     abbreviation: {
         type: Sequelize.STRING,
         allowNull: false,
         validate: {
             notEmpty: {
                 msg: 'Abbreviation is required'
+            },
+            async uniqueStreamNameInClass() {
+                const existingStream = await Streams.findOne({
+                    where: {
+                        abbreviation: this.abbreviation,
+                        classID: this.classID,
+                    },
+                });
+
+                if (existingStream) {
+                    throw new Error('Stream with the same abbreviation already exists in this class');
+                }
             }
         }
     },
@@ -116,6 +187,7 @@ const Streams = sequelize.define('Streams', {
             }
         }
     }
+    
 });
 
 // Department table
@@ -126,6 +198,16 @@ const Departments= sequelize.define('Departments',{
         validate:{
             notEmpty: {
                 msg: 'Department is required'
+            },
+            async uniqueDepartmentName(){
+                const existingDepartment= await Departments.findOne({
+                    where:{
+                        name: this.name
+                    }
+                })
+                if (existingDepartment) {
+                    throw new Error('Department with the same name already exists')
+                }
             }
         }
     },
@@ -167,6 +249,16 @@ const DepartmentHead= sequelize.define('DepartmentHead',{
                     if (staff.teachingType !== 'TEACHING') {
                         throw new Error('Staff is not a teaching staff')
                     }
+                    // A staff should only head one department
+                   const existingDepartmentHead = await DepartmentHead.findOne({
+                       where: {
+                        headID: value,
+                        endDate: null,
+                       }
+                    })
+                    if (existingDepartmentHead) {
+                     throw new Error('This staff is already the head of another department');
+                 }   
                 }
             }
     },
