@@ -66,6 +66,7 @@ const Class=sequelize.define('Class',{
             }
         }
     },
+    
     abbreviation:{
         type: Sequelize.STRING,
         allowNull:false,
@@ -85,7 +86,7 @@ const Class=sequelize.define('Class',{
             }
     },
     },
-    
+
     headID:{
         type: Sequelize.INTEGER,
         allowNull: false,
